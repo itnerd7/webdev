@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans');
+@import url('https://fonts.googleapis.com/css?family=Ubuntu');
+@import url('https://fonts.googleapis.com/css?family=Space+Mono');
+
+.center {
+  display: flex;
+  justify-content: center;
+}
+
+.left {
+  display: flex;
+  justify-content: left;
+}
+
+.logo {
+  width: 200px;
+}
+
+.padded {
+  padding-right: 20px;
+  padding-left: 20px;
+}
+
+#font1 {
+font-family: 'Plus Jakarta Sans';
+font-size: 19px;
+line-height: 1.6;
+}
+
+#font2 {
+font-family: 'Ubuntu';
+font-size: 25px;
+}
+
+#font3 {
+font-family: 'Space Mono';
+font-size: 17px;
+}

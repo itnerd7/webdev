@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Arch Install Guide</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/head-logo.webp">
+    <link rel="stylesheet" href="assets/css/style.css">
+  </head>
+  <body style="background: white;">
+  	<div class="center">
+  	   <img class="logo" src=assets/images/archlinux.png alt="Archlinux Logo">
+  	</div>
+	<div class="padded">
+	   <h1 id="font2">Installation Guide</h1>
+	   <h2 id="font1" style="font-size: 20px;">‣ Prerequisites :</h2>
+	   <p  id="font1">
+	       • Intermediate knowledge of Linux is required.<br>
+               • This Guide assumes that you are using UEFI and NOT bios.<br>
+               • BOTH the Root and Home Filesystems WILL be encrypted.<br>
+               • This Guide ONLY shows systemd-boot as the bootloader and NOT Grub.<br>
+               • Mkinitcpio WILL use systemd and NOT udev(and related) HOOKS.<br>
+               • AMD GPU is used instead of NVIDIA or INTEL.<br>
+	       • Xorg is NOT used, instead wayland is used along with Sway Window Manager.<br>
+               • Archlinux Installation media is ALREADY VERIFIED AND flashed to a USB drive.<br>
+	   </p>
+	   <h2 id="font1" style="font-size: 20px;">‣ Installation :</h2>
+	   <p  id="font1">
+	       • After Booting into the installation media, use hdparm to securely wipe the disk.<br>
+	       &ensp;You need root to do this, ALL data will be ERASED irrecoverably ! Proceed with Caution !<br>
+	       &ensp;Disk : /dev/nvme0n1<br>
+	   </p>
+	   <p  id="font3">
+	       &ensp;cryptsetup luksErase /dev/nvme0n1p{n} &emsp;&emsp;['n' is for all luks partitions on the ssd]<br>
+	       &ensp;wipefs -a /dev/nvme0n1<br>
+	       &ensp;nvme format /dev/nvme0 -s 2 -n 0xffffffff<br>
+	   </p>
+	   <p  id="font1">
+	       • Make relevant Partitions using gdisk.<br>
+               &ensp;Three Partitions are required : Root ( / ) , Boot ( /boot ) and Home : ( /home ).<br>
+               &ensp;Disk : /dev/sdb
+	   </p>
+	   <p  id="font3">
+	       &ensp;gdisk /dev/sdb ⇢ n ⇢ Size : 500M ⇢ Type : ef00 (EFI)<br>
+               &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;↳ n ⇢ Size : 60G ⇢ Type : 8304 (Root)<br>
+               &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;↳ n ⇢ Size : REST ⇢ Type : 8309 (Home)<br>
+               &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;↳ w ⇢ y<br>
+	   </p>
+	   <p  id="font1">
+	       • Make Filesystems using mkfs. Disk : /dev/sdb
+	   </p>
+	   <p  id="font3">
+	       &ensp;mkfs.fat –F32 /dev/sdb1<br>
+               &ensp;⇢ cryptsetup luksFormat /dev/sdb2<br>
+               &ensp;⇢ cryptsetup luksDump /dev/sdb2<br>
+               &ensp;⇢ cryptsetup luksOpen /dev/sdb2 luksRoot<br>
+               &ensp;mkfs.ext4 –L Root /dev/mapper/luksRoot<br>
+               &ensp;⇢ cryptsetup luksFormat /dev/sdb3<br>
+               &ensp;⇢ cryptsetup luksDump /dev/sdb3<br>
+               &ensp;⇢ cryptsetup luksOpen /dev/sdb3 luksHome<br>
+               &ensp;mkfs.ext4 –L Home /dev/mapper/luksHome<br>
+	   </p>
+	   <p  id="font1">
+	       • Mount Filesystems using mount. Disk : /dev/sdb
+	   </p>
+	   <p  id="font3">
+	       &ensp;mount /dev/mapper/luksRoot /mnt<br>
+               &ensp;⇢ mkdir /mnt/boot<br>
+               &ensp;⇢ mkdir /mnt/home<br>
+               &ensp;⇢ mkdir /mnt/etc<br>
+               &ensp;mount /dev/sdb1 /mnt/boot<br>
+               &ensp;mount /dev/mapper/luksHome /mnt/home<br>
+	   </p>
+	   <p  id="font1">• Generate fstab :</p>
+	   <p  id="font3">&ensp;genfstab –U /mnt &gt;&gt; /mnt/etc/fstab</p>
+	   <p  id="font1">•  Generate crypttab :</p>
+	   <p  id="font3">
+               &ensp;pacman -S vim<br>
+               &ensp;vim /mnt/etc/crypttab<br>
+               &ensp;[crypttab contents]<br>
+               &ensp;# &lt;Device name&gt; &lt;Device UUID&gt; &emsp;&ensp;&ensp;&ensp;&ensp;&ensp;&lt;Key&gt; &lt;Options&gt;<br>
+               &ensp;luks_home UUID=uuid-of-block-device none luks,timeout=180,password-echo=no<br>
+           </p>
+           <p  id="font1">• Install Base packages using pacstrap :</p>
+           <p  id="font3">&ensp;pacstrap –i /mnt base</p>
+           <p  id="font1">• Chroot into the installation :</p>
+           <p id="font3">&ensp;arch-chroot /mnt</p>
+           <p  id="font1">• Install all the necessary packages :</p>
+           <p id="font3">
+              &ensp;wget https://raw.githubusercontent.com/itnerd7/swaywm/main/packages.sh<br>
+              &ensp;chmod +x packages.sh &amp;&amp; ./packages.sh<br>
+           </p>
+           <p  id="font1">• Enable Networking: </p>
+           <p id="font3">
+              &ensp;systemctl enable sshd<br>
+              &ensp;systemctl enable NetworkManager<br>
+           </p>
+           <p  id="font1">
+               • Edit mkinitcpio to use a systemd based initramfs image with encryption:
+           </p>
+           <p id="font3">
+              &ensp;vim /etc/mkinitcpio.conf<br>
+              &ensp;⇢ remove ‘udev’ from the HOOKS line and replace it with ‘systemd’<br>
+              &ensp;⇢ add 'sd-encrypt' to the HOOKS line and readjust the ‘keyboard’ line<br>
+              &ensp;[HOOKS Line]<br>
+              &ensp;HOOKS=(base systemd autodetect keyboard modconf block sd-encrypt filesystems fsck)<br>
+              &ensp;mkinitcpio –p linux<br>
+           </p>
+           <p  id="font1">• Set the locale:</p>
+           <p id="font3">
+              &ensp;vim /etc/locale.gen<br>
+              &ensp;⇢ uncomment the line with your desired locale. ‘en_US.UTF-8 UTF-8’ for me.<br>
+              &ensp;locale-gen<br>
+           </p>
+           <p  id="font1">• Set the Root Password :</p>
+           <p id="font3">
+              &ensp;passwd<br>
+           </p>
+           <p  id="font1">•  Create a new user with sudo privileges:</p>
+           <p id="font3">
+              &ensp;useradd –m –g users –G wheel username<br>
+              &ensp;passwd username<br>
+              &ensp;Check if sudo is installed just in case ⇢ which sudo<br>
+              &ensp;EDITOR=vim visudo<br>
+              &ensp;⇢ Edit the file by uncommenting the WHEEL line<br>
+           </p>
+           <p  id="font1">• Install the bootloader:</p>
+           <p id="font3">
+              &ensp;⇢ Install the os-prober package only if you want other Operating systems to be recognized by the bootloader.<br>
+              &ensp;bootctl --esp-path=/boot install<br>
+              &ensp;⇢ Edit the loader.conf file<br><br>
+              &ensp;vim /boot/loader/loader.conf<br>
+              &ensp;⇢ [loader.conf contents]<br>
+              &ensp;default arch.conf<br>
+              &ensp;timeout 0<br>
+              &ensp;console-mode max<br>
+              &ensp;⇢ Edit the arch.conf file<br>
+              &ensp;vim /boot/loader/entries/arch.conf<br><br>
+              &ensp;⇢ [arch.conf contents]<br>
+              &ensp;title Archlinux<br>
+              &ensp;linux /vmlinuz-linux<br>
+              &ensp;initrd /amd-ucode.img<br>
+              &ensp;initrd /initramfs-linux.img<br>
+              &ensp;options rd.luks.name=uuid-of-block-device=luks_root root=/dev/mapper/luks_root rd.luks.options=timeout=30s,password-echo=no,tries=3 rw quiet<br>
+	   </p>
+	   <p  id="font1">• Configure correct date and time settings :</p>
+           <p id="font3">
+              &ensp;timedatectl set-timezone Asia/Kolkata<br>
+              &ensp;systemctl enable systemd-timesyncd<br>
+              &ensp;timedatectl set-ntp true<br>
+              &ensp;hwclock --systohc<br>
+           </p>
+           <p id="font1">• Configure the hostname and related settings :</p>
+           <p id="font3">
+              &ensp;hostnamectl set-hostname archer<br>
+              &ensp;vim /etc/hosts<br>
+              &ensp;[/etc/hosts contents]<br>
+              &ensp;127.0.0.1 localhost<br>
+	      &ensp;127.0.1.1 {hostname}<br>
+           </p>
+	   <p id="font1">• Configure Secureboot with sbctl :</p>
+	   <p id="font3">
+	      &ensp;⇢ Reboot to UEFI and set a strong UEFI password<br>
+	      &ensp;⇢ Clear Secureboot keys from UEFI and disable the option to revert back to default keys<br>
+	      &ensp;⇢ Reboot to Archlinux and login as root<br>
+	      &ensp;sbctl create-keys<br>
+	      &ensp;sbctl enroll-keys<br>
+	      &ensp;sbctl sign -s /boot/EFI/BOOT/BOOTX64.EFI<br>
+	      &ensp;sbctl sign -s /boot/EFI/systemd/systemd-bootx64.efi<br>
+	      &ensp;sbctl sign -s /boot/vmlinuz-linux<br>
+	      &ensp;sbctl verify<br>
+	      &ensp;sbctl status<br>
+	   </p>
+           <p id="font1">• Setup the Desktop Environment :</p>
+           <p id="font3">
+              &ensp;⇢ MUST switch from root to normal user<br>
+              &ensp;git clone https://github.com/itnerd7/swaywm.git<br>
+              &ensp;cd swaywm<br>
+              &ensp;./setup.sh<br>
+              &ensp;systemctl reboot -i<br>
+           </p>
+	</div>
+	<div class="center">
+	   <h1 id="font1" style="font-size: 25px;">Now you can say “I use Arch, By the way ¬‿¬”</h1>
+	</div>	
+  </body>
+</html>
