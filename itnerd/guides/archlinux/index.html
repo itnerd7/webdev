@@ -27,49 +27,47 @@
 	   </p>
 	   <h2 id="font1" style="font-size: 20px;">‣ Installation :</h2>
 	   <p  id="font1">
-	       • After Booting into the installation media, use hdparm to securely wipe the disk.<br>
+	       • After Booting into the installation media, use nvme-format to securely wipe the disk.<br>
 	       &ensp;You need root to do this, ALL data will be ERASED irrecoverably ! Proceed with Caution !<br>
 	       &ensp;Disk : /dev/nvme0n1<br>
 	   </p>
 	   <p  id="font3">
 	       &ensp;cryptsetup luksErase /dev/nvme0n1p{n} &emsp;&emsp;['n' is for all luks partitions on the ssd]<br>
 	       &ensp;wipefs -a /dev/nvme0n1<br>
-	       &ensp;nvme format /dev/nvme0 -s 2 -n 0xffffffff<br>
+	       &ensp;nvme format /dev/nvme0 -s 1 -n 1<br>
 	   </p>
 	   <p  id="font1">
 	       • Make relevant Partitions using gdisk.<br>
                &ensp;Three Partitions are required : Root ( / ) , Boot ( /boot ) and Home : ( /home ).<br>
-               &ensp;Disk : /dev/sdb
+               &ensp;Disk : /dev/nvme0n1
 	   </p>
 	   <p  id="font3">
-	       &ensp;gdisk /dev/sdb ⇢ n ⇢ Size : 500M ⇢ Type : ef00 (EFI)<br>
+	       &ensp;gdisk /dev/nvme0n1 ⇢ n ⇢ Size : 500M ⇢ Type : ef00 (EFI)<br>
                &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;↳ n ⇢ Size : 60G ⇢ Type : 8304 (Root)<br>
                &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;↳ n ⇢ Size : REST ⇢ Type : 8309 (Home)<br>
                &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;↳ w ⇢ y<br>
 	   </p>
 	   <p  id="font1">
-	       • Make Filesystems using mkfs. Disk : /dev/sdb
+	       • Make Filesystems using mkfs. Disk : /dev/nvme0n1
 	   </p>
 	   <p  id="font3">
-	       &ensp;mkfs.fat –F32 /dev/sdb1<br>
-               &ensp;⇢ cryptsetup luksFormat /dev/sdb2<br>
-               &ensp;⇢ cryptsetup luksDump /dev/sdb2<br>
-               &ensp;⇢ cryptsetup luksOpen /dev/sdb2 luksRoot<br>
+	       &ensp;mkfs.fat –F32 /dev/nvme0n1p1<br>
+               &ensp;⇢ cryptsetup luksFormat /dev/nvme0n1p2<br>
+               &ensp;⇢ cryptsetup luksOpen /dev/nvme0n1p2 luksRoot<br>
                &ensp;mkfs.ext4 –L Root /dev/mapper/luksRoot<br>
-               &ensp;⇢ cryptsetup luksFormat /dev/sdb3<br>
-               &ensp;⇢ cryptsetup luksDump /dev/sdb3<br>
-               &ensp;⇢ cryptsetup luksOpen /dev/sdb3 luksHome<br>
+               &ensp;⇢ cryptsetup luksFormat /dev/nvme0n1p3<br>
+               &ensp;⇢ cryptsetup luksOpen /dev/nvme0n1p3 luksHome<br>
                &ensp;mkfs.ext4 –L Home /dev/mapper/luksHome<br>
 	   </p>
 	   <p  id="font1">
-	       • Mount Filesystems using mount. Disk : /dev/sdb
+	       • Mount Filesystems using mount. Disk : /dev/nvme0n1
 	   </p>
 	   <p  id="font3">
 	       &ensp;mount /dev/mapper/luksRoot /mnt<br>
                &ensp;⇢ mkdir /mnt/boot<br>
                &ensp;⇢ mkdir /mnt/home<br>
                &ensp;⇢ mkdir /mnt/etc<br>
-               &ensp;mount /dev/sdb1 /mnt/boot<br>
+               &ensp;mount /dev/nvme0n1p1 /mnt/boot<br>
                &ensp;mount /dev/mapper/luksHome /mnt/home<br>
 	   </p>
 	   <p  id="font1">• Generate fstab :</p>
