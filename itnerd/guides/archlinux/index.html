@@ -70,20 +70,24 @@
                &ensp;mount /dev/nvme0n1p1 /mnt/boot<br>
                &ensp;mount /dev/mapper/luksHome /mnt/home<br>
 	   </p>
+	   <p  id="font1">• Generate Mirrorlist with Reflector :</p>
+	   <p  id="font3">
+               &ensp;reflector -p https -l 10 -f 5 --sort rate --save /etc/pacman.d/mirrorlist<br>
+               &ensp;pacman -Sy vim<br>
+           </p>
 	   <p  id="font1">• Generate fstab :</p>
-	   <p  id="font3">&ensp;genfstab –U /mnt &gt;&gt; /mnt/etc/fstab</p>
+	   <p  id="font3">
+	   &ensp;genfstab –U /mnt &gt;&gt; /mnt/etc/fstab<br>
+	   &ensp;⇢ Set proper permissions for /boot in fstab<br>
+	   &ensp;vim /mnt/etc/fstab<br>
+	   &ensp;⇢ Set fmask=0077 and dmask=0077<br>
+	   </p>
 	   <p  id="font1">• Generate crypttab :</p>
 	   <p  id="font3">
-               &ensp;pacman -S vim<br>
                &ensp;vim /mnt/etc/crypttab<br>
                &ensp;[crypttab contents]<br>
                &ensp;# &lt;Device name&gt; &lt;Device UUID&gt; &emsp;&ensp;&ensp;&ensp;&ensp;&lt;Key&gt; &lt;Options&gt;<br>
                &ensp;luksHome UUID=uuid-of-block-device none <br>
-           </p>
-           <p  id="font1">• Generate Mirrorlist with Reflector :</p>
-	   <p  id="font3">
-               &ensp;reflector -p https -l 10 -f 5 --sort rate --save /etc/pacman.d/mirrorlist<br>
-               &ensp;pacman -Sy<br>
            </p>
            <p  id="font1">• Install Base packages using pacstrap :</p>
            <p  id="font3">&ensp;pacstrap –i /mnt base</p>
