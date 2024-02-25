@@ -51,13 +51,13 @@
 	       • Make Filesystems using mkfs. Disk : /dev/nvme0n1
 	   </p>
 	   <p  id="font3">
-	       &ensp;mkfs.fat –F32 /dev/nvme0n1p1<br><br>
+	       &ensp;mkfs.fat -F32 /dev/nvme0n1p1<br><br>
                &ensp;⇢ cryptsetup luksFormat /dev/nvme0n1p2<br>
                &ensp;⇢ cryptsetup luksOpen /dev/nvme0n1p2 luksRoot<br>
-               &ensp;mkfs.ext4 –L Root /dev/mapper/luksRoot<br><br>
+               &ensp;mkfs.ext4 -L Root /dev/mapper/luksRoot<br><br>
                &ensp;⇢ cryptsetup luksFormat /dev/nvme0n1p3<br>
                &ensp;⇢ cryptsetup luksOpen /dev/nvme0n1p3 luksHome<br>
-               &ensp;mkfs.ext4 –L Home /dev/mapper/luksHome<br>
+               &ensp;mkfs.ext4 -L Home /dev/mapper/luksHome<br>
 	   </p>
 	   <p  id="font1">
 	       • Mount Filesystems using mount. Disk : /dev/nvme0n1
@@ -77,7 +77,7 @@
            </p>
 	   <p  id="font1">• Generate fstab :</p>
 	   <p  id="font3">
-	   &ensp;genfstab –U /mnt &gt;&gt; /mnt/etc/fstab<br>
+	   &ensp;genfstab -U /mnt &gt;&gt; /mnt/etc/fstab<br>
 	   &ensp;⇢ Set proper permissions for /boot in fstab<br>
 	   &ensp;vim /mnt/etc/fstab<br>
 	   &ensp;⇢ Set fmask=0077 and dmask=0077<br>
@@ -90,7 +90,7 @@
                &ensp;luksHome UUID=uuid-of-block-device none <br>
            </p>
            <p  id="font1">• Install Base packages using pacstrap :</p>
-           <p  id="font3">&ensp;pacstrap –i /mnt base</p>
+           <p  id="font3">&ensp;pacstrap -i /mnt base</p>
            <p  id="font1">• Chroot into the installation :</p>
            <p id="font3">&ensp;arch-chroot /mnt</p>
            <p  id="font1">• Install all the necessary packages :</p>
@@ -108,16 +108,16 @@
            </p>
            <p id="font3">
               &ensp;vim /etc/mkinitcpio.conf<br>
-              &ensp;⇢ remove ‘udev’ from the HOOKS line and replace it with ‘systemd’<br>
-              &ensp;⇢ add 'sd-encrypt' to the HOOKS line and readjust the ‘keyboard’ line<br>
+              &ensp;⇢ remove 'udev' from the HOOKS line and replace it with 'systemd'<br>
+              &ensp;⇢ add 'sd-encrypt' to the HOOKS line and readjust the 'keyboard' line<br>
               &ensp;[HOOKS Line]<br>
               &ensp;HOOKS=(base systemd autodetect keyboard modconf block sd-encrypt filesystems fsck)<br>
-              &ensp;mkinitcpio –P<br>
+              &ensp;mkinitcpio -P<br>
            </p>
            <p  id="font1">• Set the locale:</p>
            <p id="font3">
               &ensp;vim /etc/locale.gen<br>
-              &ensp;⇢ uncomment the line with your desired locale. ‘en_US.UTF-8 UTF-8’ for me.<br>
+              &ensp;⇢ uncomment the line with your desired locale. 'en_US.UTF-8 UTF-8' for me.<br>
               &ensp;locale-gen<br>
            </p>
            <p  id="font1">• Set the Root Password :</p>
@@ -126,7 +126,7 @@
            </p>
            <p  id="font1">•  Create a new user with sudo privileges:</p>
            <p id="font3">
-              &ensp;useradd –m –g users –G wheel username<br>
+              &ensp;useradd -m -g users -G wheel username<br>
               &ensp;passwd username<br>
               &ensp;Check if sudo is installed just in case ⇢ which sudo<br>
               &ensp;EDITOR=vim visudo<br>
