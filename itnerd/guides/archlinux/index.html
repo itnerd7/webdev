@@ -70,6 +70,13 @@
                &ensp;mount /dev/nvme0n1p1 /mnt/boot<br>
                &ensp;mount /dev/mapper/luksHome /mnt/home<br>
 	   </p>
+      <p  id="font1">• Check for internet connectivity and set the date/time: :</p>
+	   <p  id="font3">
+               &ensp;curl icanhazip.com<br>
+               &ensp;⇢ Output should be you Public IP Address<br><br>
+               &ensp;timedatectl set-timezone Asia/Kolkata<br>
+               &ensp;timedatectl set-ntp true<br>
+      </p>
 	   <p  id="font1">• Generate Mirrorlist with Reflector :</p>
 	   <p  id="font3">
                &ensp;reflector -p https -l 10 -f 5 --sort rate --save /etc/pacman.d/mirrorlist<br>
@@ -166,18 +173,20 @@
               &ensp;127.0.0.1 localhost<br>
 	      &ensp;127.0.1.1 {hostname}<br>
            </p>
-	   <p id="font1">• Configure Secureboot with sbctl :</p>
+	   <p id="font1">• Configure Secure Boot with sbctl :</p>
 	   <p id="font3">
-	      &ensp;⇢ Reboot to UEFI and set a strong UEFI password<br>
+	      &ensp;⇢ Reboot into UEFI and set a strong UEFI password<br>
 	      &ensp;⇢ Clear Secureboot keys from UEFI and disable the option to revert back to default keys<br>
-	      &ensp;⇢ Reboot to Archlinux and login as root<br>
+	      &ensp;⇢ Save the changes, reboot into Archlinux and login as root<br>
 	      &ensp;sbctl create-keys<br>
-	      &ensp;sbctl enroll-keys<br>
+	      &ensp;sbctl enroll-keys --tpm-eventlog<br>
 	      &ensp;sbctl sign -s /boot/EFI/BOOT/BOOTX64.EFI<br>
 	      &ensp;sbctl sign -s /boot/EFI/systemd/systemd-bootx64.efi<br>
 	      &ensp;sbctl sign -s /boot/vmlinuz-linux<br>
 	      &ensp;sbctl verify<br>
 	      &ensp;sbctl status<br>
+         &ensp;⇢ Reboot into UEFI, enable Secure Boot and set Secure Boot Preset: Maximum Security<br>
+         &ensp;⇢ Save the changes and reboot into Archlinux<br>
 	   </p>
            <p id="font1">• Setup the Desktop Environment :</p>
            <p id="font3">
