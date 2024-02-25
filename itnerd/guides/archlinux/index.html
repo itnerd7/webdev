@@ -77,9 +77,10 @@
                &ensp;timedatectl set-timezone Asia/Kolkata<br>
                &ensp;timedatectl set-ntp true<br>
       </p>
-	   <p  id="font1">• Generate Mirrorlist with Reflector :</p>
+	   <p  id="font1">• Generate Mirrorlist with Reflector & setup Pacman :</p>
 	   <p  id="font3">
                &ensp;reflector -p https -l 10 -f 5 --sort rate --save /etc/pacman.d/mirrorlist<br>
+               &ensp;sed -i 's/#ParallelDownloads = 5/ParallelDownloads = 5/g' /etc/pacman.conf<br>
                &ensp;pacman -Sy vim<br>
            </p>
 	   <p  id="font1">• Generate fstab :</p>
